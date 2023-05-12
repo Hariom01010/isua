@@ -9,10 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@googlemaps/js-api-loader": "^1.15.1",
+    "@react-google-maps/api": "^2.18.1",
+    "dotenv": "^16.0.3",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
     "next": "13.4.1",
     "react": "18.2.0",
-    "react-dom": "18.2.0"
+    "react-dom": "18.2.0",
+    "react-google-autocomplete": "^2.7.3"
   }
 }
