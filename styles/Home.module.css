@@ -53,9 +53,30 @@
     left: 159px;
 }
 
+.calculateBtn{
+    position: relative;
+    width: 141px;
+    height: 62px;
+    left: 505px;
+    top: -250px;
 
+    font-family: 'IBM Plex Sans';
+    color: white;
+    background: #1B31A8;
+    border-radius: 32px;
+    border: none;
+    cursor: pointer;
+}
 
+.addStop{
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
 
+    position: relative;
+    left: 325px;
+    top: -150px;
+}
 
 
 .mapDiv{
