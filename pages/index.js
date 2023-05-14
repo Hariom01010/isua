@@ -76,7 +76,7 @@ export default function Home() {
       <>
         <Navbar />
         <div className={styles.mainDiv}>
-          <p className={styles.introLine}>Let's calculate <b>distance</b> from Google maps</p>
+          <p className={styles.introLine}>Let&apos;s calculate <b>distance</b> from Google maps</p>
           <p className={styles.error}>{routeError}</p>
 
           <div className={styles.routeMainContainer}>
@@ -84,13 +84,13 @@ export default function Home() {
               <div className={styles.routeCalcDiv}>
 
                 {/* Origin, Stop and Destination Container  */}
-                <div className>
+                <div>
 
                   {/* Origin Container  */}
                   <div className ={styles.routeSetDiv}>
                     <p>Origin</p>
                     <Autocomplete>
-                      <input type="text" name="origin" id="origin" className ref={originRef}/>
+                      <input type="text" name="origin" id="origin" ref={originRef}/>
                     </Autocomplete>
                   </div>
 
@@ -99,10 +99,10 @@ export default function Home() {
                     <div>
                       {stop == 0?"":<p>Stop</p>}
                       {Array.from({ length: stop }, (_, index) => (
-                        <StopInput index={index} />
+                        <StopInput index={index} key={index}/>
                       ))}
                       <div className={styles.addStopBtn}>
-                        {stop==0?<button className onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add a Stop</span></button>:<button className onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add another Stop</span></button>}
+                        {stop==0?<button onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add a Stop</span></button>:<button onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add another Stop</span></button>}
                       </div>
                     </div>
                   </div>
@@ -111,12 +111,12 @@ export default function Home() {
                   <div className ={styles.routeSetDiv}>
                     <p>Destination</p>
                     <Autocomplete>
-                      <input type="text" name="origin" id="origin" className ref={destRef} />
+                      <input type="text" name="origin" id="origin" ref={destRef} />
                     </Autocomplete>
                   </div>  
                 </div>
 
-                <div className>
+                <div>
                   <button className={styles.calcBtn} onClick={calculateRoute}>Calculate</button>
                 </div>
 
@@ -167,7 +167,7 @@ function StopInput(props){
 
   return(
     <Autocomplete onPlaceChanged={()=>{handleChange(index,event, ref)}}>
-      <input type="text" name={`stop${index}`} id={`stop${index}`} className ref={ref}/>
+      <input type="text" name={`stop${index}`} id={`stop${index}`} ref={ref}/>
     </Autocomplete>
   )
 }
