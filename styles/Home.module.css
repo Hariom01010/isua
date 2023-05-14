@@ -1,7 +1,5 @@
 .mainDiv{
     background-color: #F4F8FA;
-    height: 100vh;
-    display: flex;
     justify-content: space-between;
     align-items: center;
 }
@@ -11,145 +9,169 @@
     font-size: 20px;
     text-align: center;
     color: #1B31A8;
-    background-color: #F4F8FA;
+    padding: 12px 0px;
 }
 
-.infoDiv{
+.routeMainContainer{
     display: flex;
-    width: 52vw;
-    justify-content: center;
+    justify-content: space-around;
 }
 
-.originDestDiv{
+.routeDiv{
+    width: 25em;
+}
+
+.routeCalcDiv{
     display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    align-items: center;
-    width: 17vw;
+    justify-content: space-around;
+    margin-top: 40px;
 }
 
-.originDiv, .destDiv{
-    margin: 1.5em 0px;
+.routeSetDiv{
+    margin: 35px;
 }
-.originDiv p, .destDiv p, .stopDiv p{
-    margin-bottom: 12px;
+
+.routeSetDiv p{
     font-family: "IBM Plex Sans";
     font-size: 14px;
+    margin-bottom: 5px;
 }
 
-
-.stopDiv2{
-    position: relative;
-    right: -3em;
+.routeSetDiv button{
+    text-align: right;
+    border: none;
+    background: transparent;
 }
 
-.stopDiv input{
-    margin: 12px 0px;
-}
-
-.input{
-    padding: 6px;
-    width: 250px;
-    height: 45px;
-    background: #FFFFFF;
-    border: 1px solid #DCDDEC;
-    border-radius: 6px;
+.routeSetDiv input{
+    border: 1px solid #d5d5d5;
+    margin: 8px 0px;
+    padding: 10px;
+    border-radius: 4px;
     outline: none;
 }
 
-.inputLabel{
-    font-family: 'IBM Plex Sans';
-    font-size: 14px;
-}
-
-.calcDiv{
-    width: 22vw;
-    margin-top: 5em;
-}
-
-.calculateBtn{
-    width: 141px;
-    height: 62px;
-
-
-    font-family: 'IBM Plex Sans';
-    font-size: 18px;
-    color: white;
-    background: #1B31A8;
-    border-radius: 32px;
-    border: none;
-    cursor: pointer;
-}
-
-.addStop{
-    background-color: transparent;
-    border: none;
-    cursor: pointer;
-
+.addStopBtn{
     display: flex;
-    align-items: center;
-    width: 245px;
     justify-content: flex-end;
 }
 
+.addStopBtn button{
+    display: flex;
+    align-items: center;
+}
+.addStopBtn span{
+    margin-left: 9px;
+}
+
+.calcBtn{
+    padding: 15px;
+    border: none;
+    border-radius: 30px;
+    background-color: #1B31A8;
+    color: #F4F8FA;
+    font-size: 15px;
+    font-family: "IBM Plex Sans";
+    margin-top: 10em;
+}
+
+.distanceDiv{
+    background-color: white;
+    margin-left: 45px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 6px;   
+    font-family: "IBM Plex Sans";
+    border: 1px solid #d5d5d5;
+    border-bottom: none;
+}
+
+.distanceDiv h2{
+    font-size: 15px;
+    font-weight: bolder;
+}
+
+.distanceDiv h3{
+    color: #0079FF;
+    font-size: 25px;
+}
+
+.distanceDurationDiv{
+    font-size: 12px;
+    font-family: "IBM Plex Sans";
+    padding: 15px 18px;
+    margin-left: 45px;
+    border: 1px solid #d5d5d5;
+    border-top: none;
+}
+
+.distanceDurationDiv p{
+    margin: 12px 0px;
+}
 
 .mapDiv{
-    margin: -10em 10em 0em 0em;
-    width: 560px;
-    height: 511px;
-    
+    margin-top: 50px;
+    width: 575px;
+    height: 575px;    
 }
 
-
-.distance{
-    display: flex;
-    justify-content: space-between;
-    background-color: white;
+.error{
     font-family: "IBM Plex Sans";
-    padding: 12px;
-    width: 30em;
-    margin-left: 10em;
-}
-
-.duration{
-    font-family: "IBM Plex Sans";
-    font-size: 12px;
+    color: red;
     text-align: center;
-    width: 57em;
-    margin-left: 4em;;
-    
 }
 
-.duration p{
-    margin: 6px;
-}
-
-
-@media screen and (max-width:1450px) {
+@media screen and (max-width:1200px) {
     .mapDiv{
-        margin: -10em 10em 0em 0em;
-        width: 460px;
-        height: 311px;
+        margin-top: 50px;
+        width: 375px;
+        height: 375px;    
     }
 }
-@media screen and (max-width:850px) {
-    .mainDiv{
-        flex-direction: column;
+
+@media screen and (max-width:900px) {  
+    .routeMainContainer{
+        flex-direction: column-reverse;
+        align-items: center;
     }
-    .infoDiv{
+
+    .routeCalcDiv{
         flex-direction: column;
         align-items: center;
-        width: auto;
+        justify-content: flex-start;
     }
-    .calcDiv{
-        margin: 0em;
-        margin-bottom: 20px;
+
+    .calcBtn{
+        margin-top: 0;
+    }
+    
+    .resultDiv{
+        margin: 15px auto;
+    }
+}
+
+@media screen and (max-width:500px) {  
+    
+    .routeMainContainer{
+        margin-top: -48px;
+    }
+    .introLine{
+        display: none;
+    }
+
+    .mapDiv{
+        width: 100vw;
+    }
+    
+}
+
+@media screen and (max-width:400px) {  
+    .mainDiv{
+        width: 101%;
     }
     .mapDiv{
-        margin: 0;
+        width: 101%;
     }
-    .distance{
-        width: 60vw;
-        margin: auto;
-    }
+    
 }

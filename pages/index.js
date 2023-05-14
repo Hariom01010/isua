@@ -12,6 +12,8 @@ export default function Home() {
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
   const [stop, setStopNo] = useState(0);
+  const [loadedDistance, setLoadedDistance] = useState(false)
+  const [routeError, setError] = useState("")
 
   const originRef = useRef("");
   const destRef = useRef("");
@@ -34,10 +36,11 @@ export default function Home() {
 
   // Function to calculate distance, duration and find route 
   async function calculateRoute(){
-    console.log(wayPts)
       if(originRef.current.value === "" || destRef.current.value === ""){
         return 
       }
+      try{
+      setError("")
       const directionsService = new google.maps.DirectionsService()
       const results = await directionsService.route({
         origin: originRef.current.value,
@@ -48,12 +51,23 @@ export default function Home() {
       setDirectionsResponse(results)
       setDistance(results.routes[0].legs[0].distance.text)
       setDuration(results.routes[0].legs[0].duration.text)
+      setLoadedDistance(true)
+    }catch(error){
+      console.log(error.code)
+      if(error.code == "ZERO_RESULTS"){
+        setError("No route could be found between the origin and destination.")
+      }
+      if(error.code=="NOT_FOUND"){
+        setError("One of the locations is invalid")
+      }
+    }
   }
 
   
   // Function to keep track the number of stops 
   function handleStopBtnClick(){
     setStopNo(stop+1)
+    console.log(originRef.current.value)
   }
 
   return (
@@ -61,69 +75,72 @@ export default function Home() {
     {(!isLoaded)?<p>Loading</p>:
       <>
         <Navbar />
-        <div>
-        <p className={styles.introLine}>Let's calculate <b>distance</b> from Google maps</p>
         <div className={styles.mainDiv}>
+          <p className={styles.introLine}>Let's calculate <b>distance</b> from Google maps</p>
+          <p className={styles.error}>{routeError}</p>
 
-        <div>
-          <div className={styles.infoDiv}>
-          {/* Origin and Destination Container  */}
-            <div className={styles.originDestDiv}>
+          <div className={styles.routeMainContainer}>
+            <div className={styles.routeDiv}>
+              <div className={styles.routeCalcDiv}>
 
-              {/* Origin Container  */}
-              <div className={styles.originDiv}>
-                <p className={`${styles.originLabel} ${styles.inputLabel}`}>Origin</p>
-                <Autocomplete>
-                  <input type="text" name="origin" id="origin" className={`${styles.input} ${styles.originInput}`} ref={originRef}/>
-                </Autocomplete>
-              </div>
+                {/* Origin, Stop and Destination Container  */}
+                <div className>
 
+                  {/* Origin Container  */}
+                  <div className ={styles.routeSetDiv}>
+                    <p>Origin</p>
+                    <Autocomplete>
+                      <input type="text" name="origin" id="origin" className ref={originRef}/>
+                    </Autocomplete>
+                  </div>
 
-              {/* Stop  Container*/}
-              <div className={styles.stopDiv}>
-                <div className={styles.stopDiv1}>
-                  {stop == 0?"":<p>Stop</p>}
-                  {Array.from({ length: stop }, (_, index) => (
-                    <StopInput index={index} />
-                  ))}
-                  <button className={styles.addStop} onClick={()=>handleStopBtnClick()}><BsPlusCircle /> Add a Stop</button>
-                </div>
-              </div>
-
-
-              {/* Destination Container  */}
-              <div className={styles.destDiv}>
-                <p className={`${styles.destLabel} ${styles.inputLabel}`}>Destination</p>
-                <Autocomplete>
-                  <input type="text" name="origin" id="origin" className={`${styles.input} ${styles.destInput}`} ref={destRef} />
-                </Autocomplete>
-              </div>  
-
-            </div>
-
-            <div className={styles.calcDiv}>
-                  <button className={styles.calculateBtn} onClick={calculateRoute}>Calculate</button>
-            </div>
-
-        </div>
-        {originRef.current.value===undefined || destRef.current.value===undefined?""
-                :<div className={styles.distDurDiv}>
-                    <div className={styles.distance}>
-                      <h2>Distance</h2>
-                      <h2>{distance}</h2>
-                    </div>
-                    <div className={styles.duration}>
-                      <p>The distance between <b>{originRef.current.value}</b> and <b>{destRef.current.value}</b> via the selected route is <b>{distance}</b></p>
-                      <p>The time between <b>{originRef.current.value}</b> and <b>{destRef.current.value}</b> via the selected route is <b>{duration}</b></p>
+                  {/* Stop  Container*/}
+                  <div className ={styles.routeSetDiv}>
+                    <div>
+                      {stop == 0?"":<p>Stop</p>}
+                      {Array.from({ length: stop }, (_, index) => (
+                        <StopInput index={index} />
+                      ))}
+                      <div className={styles.addStopBtn}>
+                        {stop==0?<button className onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add a Stop</span></button>:<button className onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add another Stop</span></button>}
+                      </div>
                     </div>
                   </div>
-                  }
-        
-        </div>
 
+                  {/* Destination Container  */}
+                  <div className ={styles.routeSetDiv}>
+                    <p>Destination</p>
+                    <Autocomplete>
+                      <input type="text" name="origin" id="origin" className ref={destRef} />
+                    </Autocomplete>
+                  </div>  
+                </div>
+
+                <div className>
+                  <button className={styles.calcBtn} onClick={calculateRoute}>Calculate</button>
+                </div>
+
+              </div>
+
+              {loadedDistance?(
+              <div className= {styles.resultDiv}>
+                <div className={styles.distanceDiv}>
+                  <h2>Distance</h2>
+                  <h3>{distance}</h3>
+                  </div>
+
+                  <div className={styles.distanceDurationDiv}>
+                    <p>The distance between <b>{originRef.current.value}</b> and <b>{destRef.current.value}</b> via the selected route is <b>{distance}</b></p>
+                    <p>The time between <b>{originRef.current.value}</b> and <b>{destRef.current.value}</b> via the selected route is <b>{duration}</b></p>
+                  </div>
+                </div>
+              ):""}
+            </div>
+            
+          
           {/* Map Container  */}
           <div className={styles.mapDiv}>
-            <GoogleMap center={center} zoom={15} mapContainerClassName='map-container' options={options}>
+            <GoogleMap center={center} zoom={10} mapContainerClassName='map-container' options={options}>
               <Marker position={center}/>
               {directionsResponse && < DirectionsRenderer directions={directionsResponse}/>}
             </GoogleMap>
@@ -150,7 +167,7 @@ function StopInput(props){
 
   return(
     <Autocomplete onPlaceChanged={()=>{handleChange(index,event, ref)}}>
-      <input type="text" name={`stop${index}`} id={`stop${index}`} className={`${styles.input} ${styles.stopInput}`} ref={ref}/>
+      <input type="text" name={`stop${index}`} id={`stop${index}`} className ref={ref}/>
     </Autocomplete>
   )
 }
