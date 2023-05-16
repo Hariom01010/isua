@@ -41,7 +41,6 @@ export default function Home() {
 
   // Function to calculate distance, duration and find route 
   async function calculateRoute(){
-      console.log(wayPts)
       if(originRef.current.value === "" || destRef.current.value === ""){
         return 
       }
@@ -73,7 +72,6 @@ export default function Home() {
       directionsRenderer.setMap(null);
 
     }catch(error){
-      console.log(error.code)
       if(error.code == "ZERO_RESULTS"){
         setError("No route could be found between the origin and destination.")
       }
@@ -100,7 +98,6 @@ export default function Home() {
   // Function to keep track the number of stops 
   function handleStopBtnClick(){
     setStopNo(stop+1)
-    console.log(originRef.current.value)
   }
 
   return (
@@ -193,20 +190,22 @@ export default function Home() {
                   map: directionsRenderer.getMap(),
                   });
 
+                  const lastLegIndex = directionsRenderer.directions.routes[0].legs.length - 1;
+                  const endLocation = directionsRenderer.directions.routes[0].legs[lastLegIndex].end_location;
                   const destinationMarker = new window.google.maps.Marker({
-                    position: directionsRenderer.directions.routes[0].legs[0].end_location,
+                    position: endLocation,
                     icon: destinationIcon,
                     map: directionsRenderer.getMap(),
                   });
 
-                  // Additional stop markers
-                  wayPts.forEach(wayPt => {
-                      const stopMarker = new window.google.maps.Marker({
-                      position: wayPt.location,
+                  for(let i = 0; i<directionsRenderer.directions.routes[0].legs.length-1; i++){
+                    const stopMarker = new window.google.maps.Marker({
+                      position: directionsRenderer.directions.routes[0].legs[i].end_location,
                       icon: stopIcon,
                       map: directionsRenderer.getMap(),
-                  });
-                  });
+                    });
+                  }
+                  
                 }}
               />
               }
@@ -228,12 +227,9 @@ function StopInput(props){
   
   function  handleChange(index,event, ref){
     const value = ref.current.value    
-    console.log("Before Input:", props.wayPts)
     const updatedWayPts = [...props.wayPts]; // Create a copy of the wayPts array
     updatedWayPts[index] = { location: value }; // Update the value at the specified index
-    console.log(updatedWayPts)
     props.setWayPts(updatedWayPts);
-    console.log("After Input:", props.wayPts)
     
   }
 
