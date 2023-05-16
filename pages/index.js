@@ -1,19 +1,24 @@
 import styles from '@/styles/Home.module.css'
 import Navbar from './components/Navbar/Navbar'
+import Image from 'next/image'
 import { useJsApiLoader, GoogleMap, Marker, Autocomplete, DirectionsRenderer } from '@react-google-maps/api'
 import { useRef, useState } from 'react'
 import { BsPlusCircle } from "react-icons/bs"
 
-const wayPts=[]
 
 export default function Home() {
-
+  
+  const originIcon = "/Origin Icon.png";
+  const destinationIcon = "/Destination Icon.png";
+  const stopIcon = "/Stop Icon.png";
+  
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState('');
   const [duration, setDuration] = useState('');
   const [stop, setStopNo] = useState(0);
   const [loadedDistance, setLoadedDistance] = useState(false)
   const [routeError, setError] = useState("")
+  const [wayPts, setWayPts]=useState([])
 
   const originRef = useRef("");
   const destRef = useRef("");
@@ -36,10 +41,12 @@ export default function Home() {
 
   // Function to calculate distance, duration and find route 
   async function calculateRoute(){
+      console.log(wayPts)
       if(originRef.current.value === "" || destRef.current.value === ""){
         return 
       }
       try{
+      setDirectionsResponse(null)
       setError("")
       const directionsService = new google.maps.DirectionsService()
       const results = await directionsService.route({
@@ -48,10 +55,23 @@ export default function Home() {
         travelMode: google.maps.TravelMode.DRIVING,
         waypoints:wayPts
       })
+
+      let totalDistance = 0;
+      let totalDuration = 0;
+
+      for (let i = 0; i < results.routes[0].legs.length; i++) {
+        totalDistance += results.routes[0].legs[i].distance.value;
+        totalDuration += results.routes[0].legs[i].duration.value;
+      }
+
       setDirectionsResponse(results)
-      setDistance(results.routes[0].legs[0].distance.text)
-      setDuration(results.routes[0].legs[0].duration.text)
+      setDistance(formatDistance(totalDistance))
+      setDuration(formatDuration(totalDuration))
       setLoadedDistance(true)
+
+      const directionsRenderer = new google.maps.DirectionsRenderer();
+      directionsRenderer.setMap(null);
+
     }catch(error){
       console.log(error.code)
       if(error.code == "ZERO_RESULTS"){
@@ -63,7 +83,20 @@ export default function Home() {
     }
   }
 
+  // Helper function to format distance in a user-friendly format
+  function formatDistance(distance) {
+    return (distance / 1000).toFixed(2) + " km";
+  }
   
+  // Helper function to format duration in a user-friendly format
+  function formatDuration(duration) {
+    const hours = Math.floor(duration / 3600);
+    const minutes = Math.floor((duration % 3600) / 60);
+    return `${hours} h ${minutes} min`;
+  }
+
+
+
   // Function to keep track the number of stops 
   function handleStopBtnClick(){
     setStopNo(stop+1)
@@ -90,7 +123,10 @@ export default function Home() {
                   <div className ={styles.routeSetDiv}>
                     <p>Origin</p>
                     <Autocomplete>
-                      <input type="text" name="origin" id="origin" ref={originRef}/>
+                      <div>
+                        <input type="text" name="origin" id="origin" ref={originRef} />
+                        <Image src="/Origin Icon.png" width={12} height={12} className={styles.originIcon}/>
+                      </div>
                     </Autocomplete>
                   </div>
 
@@ -99,7 +135,7 @@ export default function Home() {
                     <div>
                       {stop == 0?"":<p>Stop</p>}
                       {Array.from({ length: stop }, (_, index) => (
-                        <StopInput index={index} key={index}/>
+                        <StopInput index={index} key={index} wayPts={wayPts} setWayPts={setWayPts}/>
                       ))}
                       <div className={styles.addStopBtn}>
                         {stop==0?<button onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add a Stop</span></button>:<button onClick={()=>handleStopBtnClick()}><BsPlusCircle size={15}/> <span>Add another Stop</span></button>}
@@ -111,12 +147,15 @@ export default function Home() {
                   <div className ={styles.routeSetDiv}>
                     <p>Destination</p>
                     <Autocomplete>
-                      <input type="text" name="origin" id="origin" ref={destRef} />
+                      <div>
+                        <input type="text" name="origin" id="origin" ref={destRef} />
+                        <Image src="/Destination Icon.png" width={15} height={20} className={styles.destIcon}/>
+                      </div>
                     </Autocomplete>
                   </div>  
                 </div>
 
-                <div>
+                <div className = {styles.calcBtnDiv}>
                   <button className={styles.calcBtn} onClick={calculateRoute}>Calculate</button>
                 </div>
 
@@ -141,8 +180,36 @@ export default function Home() {
           {/* Map Container  */}
           <div className={styles.mapDiv}>
             <GoogleMap center={center} zoom={10} mapContainerClassName='map-container' options={options}>
-              <Marker position={center}/>
-              {directionsResponse && < DirectionsRenderer directions={directionsResponse}/>}
+              {directionsResponse && 
+              <DirectionsRenderer
+                directions={directionsResponse}
+                options={{
+                  suppressMarkers: true, // Disable default markers
+                }}
+                onLoad={directionsRenderer => {
+                  const originMarker = new window.google.maps.Marker({
+                  position: directionsRenderer.directions.routes[0].legs[0].start_location,
+                  icon: originIcon,
+                  map: directionsRenderer.getMap(),
+                  });
+
+                  const destinationMarker = new window.google.maps.Marker({
+                    position: directionsRenderer.directions.routes[0].legs[0].end_location,
+                    icon: destinationIcon,
+                    map: directionsRenderer.getMap(),
+                  });
+
+                  // Additional stop markers
+                  wayPts.forEach(wayPt => {
+                      const stopMarker = new window.google.maps.Marker({
+                      position: wayPt.location,
+                      icon: stopIcon,
+                      map: directionsRenderer.getMap(),
+                  });
+                  });
+                }}
+              />
+              }
             </GoogleMap>
           </div>   
         </div>
@@ -158,16 +225,24 @@ export default function Home() {
 function StopInput(props){
   const ref = useRef("")
   const index = props.index
-
+  
   function  handleChange(index,event, ref){
-    const value = ref.current.value
+    const value = ref.current.value    
+    console.log("Before Input:", props.wayPts)
+    const updatedWayPts = [...props.wayPts]; // Create a copy of the wayPts array
+    updatedWayPts[index] = { location: value }; // Update the value at the specified index
+    console.log(updatedWayPts)
+    props.setWayPts(updatedWayPts);
+    console.log("After Input:", props.wayPts)
     
-    wayPts[index] = {location: value}
   }
 
   return(
     <Autocomplete onPlaceChanged={()=>{handleChange(index,event, ref)}}>
-      <input type="text" name={`stop${index}`} id={`stop${index}`} ref={ref}/>
+      <div>
+        <input type="text" name={`stop${index}`} id={`stop${index}`} ref={ref}/>
+        <Image src="/Stop Icon.png" width={15} height={15} className={styles.stopIcon}/>
+      </div>
     </Autocomplete>
   )
 }
