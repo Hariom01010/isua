@@ -56,12 +56,14 @@
 
 .addStopBtn{
     display: flex;
+    cursor: pointer;
     justify-content: flex-end;
 }
 
 .addStopBtn button{
     display: flex;
     align-items: center;
+    cursor: pointer;
 }
 .addStopBtn span{
     margin-left: 9px;
@@ -76,6 +78,7 @@
     font-size: 15px;
     font-family: "IBM Plex Sans";
     margin-top: 10em;
+    cursor: pointer;
 }
 
 .distanceDiv{
